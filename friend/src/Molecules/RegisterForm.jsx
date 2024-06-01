@@ -5,12 +5,14 @@ import { useNavigate } from 'react-router-dom';
 
 export default function LoginForm() {
 
+    const [Username, setUsername] = useState('');
     const [Email, setEmail] = useState('');
     const [Password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleLogin = () => {
         const userLoginData = {
-            Username:"Tmp",
+            Username:Username,
             Email: Email,
             Password: Password,
             Role: "USER"
@@ -20,9 +22,17 @@ export default function LoginForm() {
             method: "POST", 
             headers:{"Content-type":"application/json"},
             body:JSON.stringify(userLoginData)
-        }).then(()=>{
+        }).then(response => {
+            if (!response.ok) {
+                return response.text().then(errorMessage => {
+                    throw new Error(errorMessage);
+                });
+            }
             console.log("User Logged In Succesfully : " + userLoginData);
-        }) 
+        })
+        .catch(error => {
+            setErrorMessage(error.message); // Mettre à jour l'état avec le message d'erreur
+        });
     };
 
     return (
@@ -33,7 +43,7 @@ export default function LoginForm() {
                     label="Username"
                     type="username"
                     placeholder="Toobo" 
-                    onChange={(value) => setEmail(value)}
+                    onChange={(value) => setUsername(value)}
                 />
                 <InputField
                     id="Email"
@@ -49,6 +59,7 @@ export default function LoginForm() {
                     placeholder="************"
                     onChange={(value) => setPassword(value)}
                 />
+                {errorMessage && <p className="text-red-500">{errorMessage}</p>} {/* Afficher le message d'erreur s'il est défini */}
                 <Button name="Login" handleAction={handleLogin}></Button>
             </div>
         </div>
