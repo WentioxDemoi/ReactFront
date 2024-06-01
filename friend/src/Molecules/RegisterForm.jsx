@@ -12,23 +12,28 @@ export default function LoginForm() {
 
     const handleLogin = () => {
         const userLoginData = {
-            Username:Username,
-            Email: Email,
-            Password: Password,
-            Role: "USER"
+            username: Username,
+            email: Email,
+            password: Password,
+            role: "USER"
         };
-        fetch("http://localhost:8080/user/register", 
+
+        fetch("http://localhost:8080/user/login", 
         {
             method: "POST", 
             headers:{"Content-type":"application/json"},
             body:JSON.stringify(userLoginData)
-        }).then(response => {
+        })
+        .then(response => {
             if (!response.ok) {
                 return response.text().then(errorMessage => {
                     throw new Error(errorMessage);
                 });
             }
-            console.log("User Logged In Succesfully : " + userLoginData);
+            return response.text();  // Attendre la réponse comme texte
+        })
+        .then(username => {
+            console.log("User Logged In Succesfully : " + username);
         })
         .catch(error => {
             setErrorMessage(error.message); // Mettre à jour l'état avec le message d'erreur
