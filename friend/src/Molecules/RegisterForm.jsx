@@ -10,7 +10,7 @@ export default function LoginForm() {
     const [Password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
-    const handleLogin = () => {
+    const handleRegister = () => {
         const userLoginData = {
             username: Username,
             email: Email,
@@ -18,7 +18,7 @@ export default function LoginForm() {
             role: "USER"
         };
 
-        fetch("http://localhost:8080/user/login", 
+        fetch("http://localhost:8080/user/register", 
         {
             method: "POST", 
             headers:{"Content-type":"application/json"},
@@ -32,8 +32,9 @@ export default function LoginForm() {
             }
             return response.text();  // Attendre la réponse comme texte
         })
-        .then(username => {
-            console.log("User Logged In Succesfully : " + username);
+        .then(token => {
+            console.log("User Logged In Successfully, Token:", token);
+            localStorage.setItem("jwt", token);
         })
         .catch(error => {
             setErrorMessage(error.message); // Mettre à jour l'état avec le message d'erreur
@@ -65,7 +66,7 @@ export default function LoginForm() {
                     onChange={(value) => setPassword(value)}
                 />
                 {errorMessage && <p className="text-red-500">{errorMessage}</p>} {/* Afficher le message d'erreur s'il est défini */}
-                <Button name="Login" handleAction={handleLogin}></Button>
+                <Button name="Register" handleAction={handleRegister}></Button>
             </div>
         </div>
     );

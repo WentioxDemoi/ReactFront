@@ -4,30 +4,39 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function LoginForm() {
-
+    const [Username, setUsername] = useState('');
     const [Email, setEmail] = useState('');
     const [Password, setPassword] = useState('');
-    const navigate = useNavigate();
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleLogin = () => {
         const userLoginData = {
-            Username:"Tmp",
-            Email: Email,
-            Password: Password,
-            Role: "USER"
+            username: Username,
+            email: Email,
+            password: Password,
+            role: "USER"
         };
-        fetch("http://localhost:8080/user/register", 
+
+        fetch("http://localhost:8080/user/login", 
         {
             method: "POST", 
-            headers:{"Content-type":"application/json"},
-            body:JSON.stringify(userLoginData)
-        }).then((response) => {
-            if (response.ok) {
-                console.log("User Logged In Successfully");
-                navigate("/");
-            } else {
-                console.log("Login Failed");
+            headers: {"Content-type": "application/json"},
+            body: JSON.stringify(userLoginData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(errorMessage => {
+                    throw new Error(errorMessage);
+                });
             }
+            return response.text();
+        })
+        .then(token => {
+            console.log("User Logged In Successfully, Token:", token);
+            localStorage.setItem("jwt", token);
+        })
+        .catch(error => {
+            setErrorMessage(error.message);
         });
     };
 
@@ -37,8 +46,8 @@ export default function LoginForm() {
                 <InputField
                     id="Email"
                     label="Email"
-                    type="email"
-                    placeholder="name@gmail.com" 
+                    type="text"
+                    placeholder="Toobo"
                     onChange={(value) => setEmail(value)}
                 />
                 <InputField
@@ -48,6 +57,7 @@ export default function LoginForm() {
                     placeholder="************"
                     onChange={(value) => setPassword(value)}
                 />
+                {errorMessage && <p className="text-red-500">{errorMessage}</p>} {/* Afficher le message d'erreur s'il est défini */}
                 <Button name="Login" handleAction={handleLogin}></Button>
             </div>
         </div>
